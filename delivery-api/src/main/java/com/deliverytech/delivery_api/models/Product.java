@@ -1,4 +1,4 @@
-package com.deliverytech.delivery_api.model;
+package com.deliverytech.delivery_api.models;
 
 import jakarta.persistence.*;
 

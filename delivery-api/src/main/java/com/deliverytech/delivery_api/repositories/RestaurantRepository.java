@@ -1,8 +1,8 @@
-package com.deliverytech.delivery_api.repository;
-
-import com.deliverytech.delivery_api.model.Restaurant;
+package com.deliverytech.delivery_api.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.deliverytech.delivery_api.models.Restaurant;
 
 import java.util.List;
 

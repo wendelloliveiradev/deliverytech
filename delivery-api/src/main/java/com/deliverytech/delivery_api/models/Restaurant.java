@@ -1,10 +1,10 @@
-package com.deliverytech.delivery_api.model;
+package com.deliverytech.delivery_api.models;
 
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "clients")
-public class Client {
+@Table(name = "restaurants")
+public class Restaurant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -12,18 +12,20 @@ public class Client {
 
     private String name;
 
-    @Column(unique = true)
-    private String email;
+    private String category;
 
     private Boolean active;
 
-    public Client() {
+    private Double rating;
+
+    public Restaurant() {
     }
 
-    public Client(String name, String email, Boolean active) {
+    public Restaurant(String name, String category, Boolean active, Double rating) {
         this.name = name;
-        this.email = email;
+        this.category = category;
         this.active = active;
+        this.rating = rating;
     }
 
     public Long getId() {
@@ -42,12 +44,12 @@ public class Client {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
+    public String getCategory() {
+        return category;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public Boolean getActive() {
@@ -56,5 +58,13 @@ public class Client {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
     }
 }

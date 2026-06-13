@@ -1,14 +1,14 @@
-package com.deliverytech.delivery_api.repository;
-
-import com.deliverytech.delivery_api.model.FoodOrder;
-import com.deliverytech.delivery_api.model.StatusOrder;
+package com.deliverytech.delivery_api.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.deliverytech.delivery_api.models.FoodOrder;
+import com.deliverytech.delivery_api.models.StatusOrder;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface OrderRepository extends JpaRepository<FoodOrder, Long> {
+public interface FoodOrderRepository extends JpaRepository<FoodOrder, Long> {
 
     List<FoodOrder> findByClientId(Long clientId);
 
