@@ -13,6 +13,7 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
 
+    // Dependency injection via constructor
     public ClientService(ClientRepository clientRepository) {
         this.clientRepository = clientRepository;
     }

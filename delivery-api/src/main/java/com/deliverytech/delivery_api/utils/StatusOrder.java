@@ -1,4 +1,4 @@
-package com.deliverytech.delivery_api.models;
+package com.deliverytech.delivery_api.utils;
 
 public enum StatusOrder {
     PENDING,

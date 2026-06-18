@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
+import com.deliverytech.delivery_api.utils.StatusOrder;
+
 @Entity
 @Table(name = "food_orders")
 public class FoodOrder {

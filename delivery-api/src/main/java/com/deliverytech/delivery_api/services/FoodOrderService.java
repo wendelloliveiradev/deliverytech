@@ -2,9 +2,9 @@ package com.deliverytech.delivery_api.services;
 
 import com.deliverytech.delivery_api.models.Client;
 import com.deliverytech.delivery_api.models.FoodOrder;
-import com.deliverytech.delivery_api.models.StatusOrder;
 import com.deliverytech.delivery_api.repositories.ClientRepository;
 import com.deliverytech.delivery_api.repositories.FoodOrderRepository;
+import com.deliverytech.delivery_api.utils.StatusOrder;
 
 import jakarta.persistence.EntityNotFoundException;
 
