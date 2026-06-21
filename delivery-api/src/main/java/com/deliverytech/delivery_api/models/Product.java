@@ -1,9 +1,15 @@
 package com.deliverytech.delivery_api.models;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "products")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Product {
 
     @Id
@@ -22,9 +28,6 @@ public class Product {
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
-    public Product() {
-    }
-
     public Product(String name,
             String category,
             Double price,
@@ -34,54 +37,6 @@ public class Product {
         this.category = category;
         this.price = price;
         this.available = available;
-        this.restaurant = restaurant;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    public Boolean getAvailable() {
-        return available;
-    }
-
-    public void setAvailable(Boolean available) {
-        this.available = available;
-    }
-
-    public Restaurant getRestaurant() {
-        return restaurant;
-    }
-
-    public void setRestaurant(Restaurant restaurant) {
         this.restaurant = restaurant;
     }
 }

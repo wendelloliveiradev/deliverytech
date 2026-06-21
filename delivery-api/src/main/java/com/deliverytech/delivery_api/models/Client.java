@@ -1,9 +1,15 @@
 package com.deliverytech.delivery_api.models;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "clients")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Client {
 
     @Id
@@ -17,44 +23,9 @@ public class Client {
 
     private Boolean active;
 
-    public Client() {
-    }
-
     public Client(String name, String email, Boolean active) {
         this.name = name;
         this.email = email;
-        this.active = active;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
         this.active = active;
     }
 }
