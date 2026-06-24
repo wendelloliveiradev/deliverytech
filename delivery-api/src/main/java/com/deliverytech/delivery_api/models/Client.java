@@ -21,6 +21,10 @@ public class Client {
     @Column(unique = true)
     private String email;
 
+    private String phone;
+
+    private String address;
+
     private Boolean active;
 
     public Client(String name, String email, Boolean active) {
@@ -28,4 +32,7 @@ public class Client {
         this.email = email;
         this.active = active;
     }
+
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<FoodOrder> food_orders;
 }

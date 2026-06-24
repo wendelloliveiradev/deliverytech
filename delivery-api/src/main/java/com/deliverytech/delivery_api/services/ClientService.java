@@ -4,19 +4,18 @@ import com.deliverytech.delivery_api.models.Client;
 import com.deliverytech.delivery_api.repositories.ClientRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class ClientService {
-
     private final ClientRepository clientRepository;
-
-    // Dependency injection via constructor
-    public ClientService(ClientRepository clientRepository) {
-        this.clientRepository = clientRepository;
-    }
 
     /**
      * Registers a new client.

@@ -1,35 +1,37 @@
 package com.deliverytech.delivery_api.controllers;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/clients")
 public class ClientController {
     
-    @PostMapping("/clients")
-    public String postMethodName(@RequestBody String entity) {
+    @PostMapping
+    public ResponseEntity<?> postMethodName(@RequestBody String entity) {
         //TODO: process POST request
         
-        return entity;
+        return ResponseEntity.ok(entity);
     }
 
-    @GetMapping("/clients")
+    @GetMapping
     public String getClients(@RequestParam String param) {
         return new String();
     }
 
-    @GetMapping("/clients/{id}")
+    @GetMapping("/{id}")
     public String getClientById(@PathVariable String id) {
         return new String();
     }
 
-    @PutMapping("/clients/{id}")
+    @PutMapping("/{id}")
     public String putMethodName(@PathVariable String id, @RequestBody String entity) {
         //TODO: process PUT request
         
         return entity;
     }
     
-    @DeleteMapping("/clients/{id}")
+    @DeleteMapping("/{id}")
     public String deleteMethodName(@PathVariable String id) {
         //TODO: process DELETE request
         return new String();
