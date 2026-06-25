@@ -6,30 +6,22 @@ import com.deliverytech.delivery_api.repositories.ProductRepository;
 import com.deliverytech.delivery_api.repositories.RestaurantRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ProductService {
-
     private final ProductRepository productRepository;
     private final RestaurantRepository restaurantRepository;
-
-    public ProductService(
-            ProductRepository productRepository,
-            RestaurantRepository restaurantRepository) {
-
-        this.productRepository = productRepository;
-        this.restaurantRepository = restaurantRepository;
-    }
 
     /**
      * Registers a new product.
      */
     public Product register(Product product) {
-
         validateProductData(product);
 
         Restaurant restaurant = validateRestaurant(
