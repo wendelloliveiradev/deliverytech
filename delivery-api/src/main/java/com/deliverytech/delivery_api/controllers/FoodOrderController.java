@@ -30,7 +30,6 @@ public class FoodOrderController {
         return new String();
     }
     
-
     @PutMapping("/{id}")
     public String updateFoodOrder(@PathVariable String id, @RequestBody String entity) {
         //TODO: process PUT request

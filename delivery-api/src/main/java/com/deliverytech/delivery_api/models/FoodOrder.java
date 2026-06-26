@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.deliverytech.delivery_api.utils.StatusOrder;
@@ -30,6 +31,13 @@ public class FoodOrder {
     @JoinColumn(name = "client_id")
     @Setter
     private Client client;
+
+    private BigDecimal totalValue;
+
+    @PrePersist
+    private void prePersist() {
+        this.orderDate = LocalDateTime.now();
+    }
 
     public FoodOrder(LocalDateTime orderDate,
             StatusOrder status,

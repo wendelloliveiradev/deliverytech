@@ -7,6 +7,7 @@ import com.deliverytech.delivery_api.repositories.FoodOrderRepository;
 import com.deliverytech.delivery_api.utils.StatusOrder;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class FoodOrderService {
     /**
      * Creates a new order.
      */
+    @Transactional
     public FoodOrder create(FoodOrder order) {
 
         validateOrder(order);

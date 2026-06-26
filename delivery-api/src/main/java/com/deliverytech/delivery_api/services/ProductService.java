@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -157,7 +158,7 @@ public class ProductService {
                     "Product price is required.");
         }
 
-        if (product.getPrice() <= 0) {
+        if (product.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException(
                     "Product price must be greater than zero.");
         }

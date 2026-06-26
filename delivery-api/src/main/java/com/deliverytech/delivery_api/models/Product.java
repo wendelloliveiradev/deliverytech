@@ -1,5 +1,7 @@
 package com.deliverytech.delivery_api.models;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +22,7 @@ public class Product {
 
     private String category;
 
-    private Double price;
+    private BigDecimal price;
 
     private Boolean available;
 
@@ -30,7 +32,7 @@ public class Product {
 
     public Product(String name,
             String category,
-            Double price,
+            BigDecimal price,
             Boolean available,
             Restaurant restaurant) {
         this.name = name;

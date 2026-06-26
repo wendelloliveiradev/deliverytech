@@ -2,6 +2,9 @@ package com.deliverytech.delivery_api.controllers;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.deliverytech.delivery_api.models.Product;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/products")
 public class ProductController {
     @PostMapping
-    public String insertProduct(@RequestBody String entity) {
+    public Product insertProduct(@RequestBody Product entity) {
         //TODO: process POST request
         
         return entity;
@@ -28,8 +31,8 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public String getProductById(@PathVariable String id) {
-        return new String();
+    public Product getProductById(@PathVariable Long id) {
+        return new Product();
     }
     
     @GetMapping("/{restaurant}")
