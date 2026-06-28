@@ -15,14 +15,13 @@ public class Restaurant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
-
     private String category;
-
     private Boolean active;
-
     private Double rating;
+    private String address;
+    private String phone;
+    private java.math.BigDecimal deliveryFee;
 
     public Restaurant(String name, String category, Boolean active, Double rating) {
         this.name = name;
