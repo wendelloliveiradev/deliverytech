@@ -1,9 +1,15 @@
 package com.deliverytech.delivery_api.models;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.math.BigDecimal;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "restaurants")
@@ -21,7 +27,7 @@ public class Restaurant {
     private Double rating;
     private String address;
     private String phone;
-    private java.math.BigDecimal deliveryFee;
+    private BigDecimal deliveryFee;
 
     public Restaurant(String name, String category, Boolean active, Double rating) {
         this.name = name;

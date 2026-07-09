@@ -1,6 +1,7 @@
 package com.deliverytech.delivery_api.models;
 
-import jakarta.persistence.*;
+import com.deliverytech.delivery_api.utils.StatusOrder;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,13 +9,22 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.deliverytech.delivery_api.utils.StatusOrder;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "food_orders")
+@Table(name = "customers_orders")
 @Getter
 @NoArgsConstructor
-public class FoodOrder {
+public class CustomerOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,9 +38,9 @@ public class FoodOrder {
     private StatusOrder status;
 
     @ManyToOne
-    @JoinColumn(name = "client_id")
+    @JoinColumn(name = "customer_id")
     @Setter
-    private Client client;
+    private Customer customer;
 
     private BigDecimal totalValue;
 
@@ -39,11 +49,11 @@ public class FoodOrder {
         this.orderDate = LocalDateTime.now();
     }
 
-    public FoodOrder(LocalDateTime orderDate,
+    public CustomerOrder(LocalDateTime orderDate,
             StatusOrder status,
-            Client client) {
+            Customer customer) {
         this.orderDate = orderDate;
         this.status = status;
-        this.client = client;
+        this.customer = customer;
     }
 }

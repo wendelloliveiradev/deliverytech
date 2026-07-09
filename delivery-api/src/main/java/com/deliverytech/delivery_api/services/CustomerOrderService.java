@@ -1,9 +1,9 @@
 package com.deliverytech.delivery_api.services;
 
-import com.deliverytech.delivery_api.models.Client;
-import com.deliverytech.delivery_api.models.FoodOrder;
-import com.deliverytech.delivery_api.repositories.ClientRepository;
-import com.deliverytech.delivery_api.repositories.FoodOrderRepository;
+import com.deliverytech.delivery_api.models.Customer;
+import com.deliverytech.delivery_api.models.CustomerOrder;
+import com.deliverytech.delivery_api.repositories.CustomerRepository;
+import com.deliverytech.delivery_api.repositories.CustomerOrderRepository;
 import com.deliverytech.delivery_api.utils.StatusOrder;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -17,22 +17,22 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class FoodOrderService {
-    private final FoodOrderRepository foodOrderRepository;
-    private final ClientRepository clientRepository;
+public class CustomerOrderService {
+    private final CustomerOrderRepository customerOrderRepository;
+    private final CustomerRepository customerRepository;
 
     /**
      * Creates a new order.
      */
     @Transactional
-    public FoodOrder create(FoodOrder order) {
+    public CustomerOrder create(CustomerOrder order) {
 
         validateOrder(order);
 
-        Client client = validateClient(
-                order.getClient().getId());
+        Customer customer = validateCustomer(
+                order.getCustomer().getId());
 
-        order.setClient(client);
+        order.setCustomer(customer);
 
         if (order.getOrderDate() == null) {
             order.setOrderDate(LocalDateTime.now());
@@ -42,46 +42,46 @@ public class FoodOrderService {
             order.setStatus(StatusOrder.CONFIRMED);
         }
 
-        return foodOrderRepository.save(order);
+        return customerOrderRepository.save(order);
     }
 
     /**
      * Finds an order by ID.
      */
-    public FoodOrder findById(Long id) {
+    public CustomerOrder findById(Long id) {
 
-        return foodOrderRepository.findById(id)
+        return customerOrderRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Order not found with ID: " + id));
     }
 
     /**
-     * Finds orders by client.
+     * Finds orders by customer.
      */
-    public List<FoodOrder> findByClient(Long clientId) {
+    public List<CustomerOrder> findByCustomer(Long customerId) {
 
-        validateClient(clientId);
+        validateCustomer(customerId);
 
-        return foodOrderRepository.findByClientId(clientId);
+        return customerOrderRepository.findByCustomerId(customerId);
     }
 
     /**
      * Finds orders by status.
      */
-    public List<FoodOrder> findByStatus(StatusOrder status) {
+    public List<CustomerOrder> findByStatus(StatusOrder status) {
 
         if (status == null) {
             throw new IllegalArgumentException(
                     "Status is required.");
         }
 
-        return foodOrderRepository.findByStatus(status);
+        return customerOrderRepository.findByStatus(status);
     }
 
     /**
      * Finds orders within a period.
      */
-    public List<FoodOrder> findByPeriod(
+    public List<CustomerOrder> findByPeriod(
             LocalDateTime start,
             LocalDateTime end) {
 
@@ -95,7 +95,7 @@ public class FoodOrderService {
                     "Start date cannot be after end date.");
         }
 
-        return foodOrderRepository.findByOrderDateBetween(
+        return customerOrderRepository.findByOrderDateBetween(
                 start,
                 end);
     }
@@ -103,11 +103,11 @@ public class FoodOrderService {
     /**
      * Changes order status.
      */
-    public FoodOrder changeStatus(
+    public CustomerOrder changeStatus(
             Long orderId,
             StatusOrder newStatus) {
 
-        FoodOrder order = findById(orderId);
+        CustomerOrder order = findById(orderId);
 
         validateStatusTransition(
                 order.getStatus(),
@@ -115,13 +115,13 @@ public class FoodOrderService {
 
         order.setStatus(newStatus);
 
-        return foodOrderRepository.save(order);
+        return customerOrderRepository.save(order);
     }
 
     /**
      * Cancels an order.
      */
-    public FoodOrder cancel(Long orderId) {
+    public CustomerOrder cancel(Long orderId) {
 
         return changeStatus(
                 orderId,
@@ -131,40 +131,40 @@ public class FoodOrderService {
     /**
      * Validates order data.
      */
-    private void validateOrder(FoodOrder order) {
+    private void validateOrder(CustomerOrder order) {
 
         if (order == null) {
             throw new IllegalArgumentException(
                     "Order cannot be null.");
         }
 
-        if (order.getClient() == null) {
+        if (order.getCustomer() == null) {
             throw new IllegalArgumentException(
-                    "Client is required.");
+                    "Customer is required.");
         }
 
-        if (order.getClient().getId() == null) {
+        if (order.getCustomer().getId() == null) {
             throw new IllegalArgumentException(
-                    "Client ID is required.");
+                    "Customer ID is required.");
         }
     }
 
     /**
-     * Validates that the client exists and is active.
+     * Validates that the customer exists and is active.
      */
-    private Client validateClient(Long clientId) {
+    private Customer validateCustomer(Long customerId) {
 
-        Client client = clientRepository.findById(clientId)
+        Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Client not found with ID: "
-                                + clientId));
+                        "Customer not found with ID: "
+                                + customerId));
 
-        if (!Boolean.TRUE.equals(client.getActive())) {
+        if (!Boolean.TRUE.equals(customer.getActive())) {
             throw new IllegalArgumentException(
-                    "Inactive clients cannot place orders.");
+                    "Inactive customers cannot place orders.");
         }
 
-        return client;
+        return customer;
     }
 
     /**

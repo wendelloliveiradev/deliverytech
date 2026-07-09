@@ -16,10 +16,10 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
-    private final ClientRepository clientRepository;
+    private final CustomerRepository clientRepository;
     private final RestaurantRepository restaurantRepository;
     private final ProductRepository productRepository;
-    private final FoodOrderRepository orderRepository;
+    private final CustomerOrderRepository orderRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -28,19 +28,19 @@ public class DataLoader implements CommandLineRunner {
 
     private void inserirClientes() {
         System.out.println("--- Inserindo clientes ---");
-        Client client1 = new Client();
+        Customer client1 = new Customer();
         client1.setName("João Silva");
         client1.setEmail("joao@email.com");
         client1.setPhone("11987654321");
         client1.setAddress("Rua A, 123, São Paulo");
         client1.setActive(true);
-        Client client2 = new Client();
+        Customer client2 = new Customer();
         client2.setName("Maria Santos");
         client2.setEmail("maria@email.com");
         client2.setPhone("11998765432");
         client2.setAddress("Avenida B, 456, Rio de Janeiro");
         client2.setActive(true);
-        Client client3 = new Client();
+        Customer client3 = new Customer();
         client3.setName("Pedro Oliveira");
         client3.setEmail("pedro@email.com");
         client3.setPhone("11912345678");
@@ -76,7 +76,7 @@ public class DataLoader implements CommandLineRunner {
         System.out.println("\nTestes ClienteRepository");
         var clienteByEmail = clientRepository.findByEmail("joao@email.com");
         System.out.println("Cliente por email: " +
-                clienteByEmail.map(Client::getName).orElse("Não encontrado"));
+                clienteByEmail.map(Customer::getName).orElse("Não encontrado"));
         var clientesAtivos = clientRepository.findByActive(true);
         System.out.println("Clientes ativos: " + clientesAtivos.size());
         var clientesPorNome = clientRepository.findByNameContainingIgnoreCase("silva");
