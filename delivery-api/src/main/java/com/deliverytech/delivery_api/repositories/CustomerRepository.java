@@ -21,12 +21,12 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     Optional<Customer> findByPhone(String phone);
 
-    @Query("SELECT DISTINCT c FROM customers c JOIN c.food_orders f WHERE c.active = true")
+    @Query("SELECT DISTINCT c FROM Customer c JOIN c.customerOrders f WHERE c.active = true")
     List<Customer> findCustomersWithFoodOrders();
 
-    @Query("SELECT c FROM customers c WHERE c.address LIKE CONCAT('%', :city, '%')")
+    @Query("SELECT c FROM Customer c WHERE c.address LIKE CONCAT('%', :city, '%')")
     List<Customer> findByCity(@Param("city") String city);
 
-    @Query("SELECT COUNT(c) FROM customers c WHERE c.active = true")
+    @Query("SELECT COUNT(c) FROM Customer c WHERE c.active = true")
     Long countActiveCustomers();
 }
