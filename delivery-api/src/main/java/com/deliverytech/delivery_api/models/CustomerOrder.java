@@ -5,6 +5,7 @@ import com.deliverytech.delivery_api.utils.StatusOrder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.AccessLevel;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,26 +24,25 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "customers_orders")
 @Getter
+@Setter
 @NoArgsConstructor
 public class CustomerOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long id;
 
-    @Setter
     private LocalDateTime orderDate;
 
     @Enumerated(EnumType.STRING)
-    @Setter
     private StatusOrder status;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    @Setter
     private Customer customer;
 
-    private BigDecimal totalValue;
+    private BigDecimal totalAmount;
 
     @PrePersist
     private void prePersist() {
@@ -51,9 +51,11 @@ public class CustomerOrder {
 
     public CustomerOrder(LocalDateTime orderDate,
             StatusOrder status,
-            Customer customer) {
+            Customer customer,
+            BigDecimal totalAmount) {
         this.orderDate = orderDate;
         this.status = status;
         this.customer = customer;
+        this.totalAmount = totalAmount;
     }
 }

@@ -3,6 +3,8 @@ package com.deliverytech.delivery_api.models;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.AccessLevel;
+
 import java.math.BigDecimal;
 
 import jakarta.persistence.Entity;
@@ -20,6 +22,7 @@ public class Restaurant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long id;
     private String name;
     private String category;

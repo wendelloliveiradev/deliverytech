@@ -41,9 +41,11 @@ public class Customer {
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CustomerOrder> customerOrders;
 
-    public Customer(String name, String email, Boolean active) {
+    public Customer(String name, String email, String phone, String address, Boolean active) {
         this.name = name;
         this.email = email;
+        this.phone = phone;
+        this.address = address;
         this.active = active;
     }
 }
