@@ -24,8 +24,13 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         System.out.println("=== INICIANDO CARGA DE DADOS DE TESTE ===");
+        insertCustomers();
+        insertRestaurants();
     }
 
+    /**
+     * Insere clientes de teste no banco de dados.
+     */
     private void insertCustomers() {
         System.out.println("--- Inserindo clientes ---");
 

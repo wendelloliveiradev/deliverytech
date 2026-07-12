@@ -17,6 +17,6 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 
     List<Restaurant> findAllByOrderByRatingDesc();
 
-    @Query("SELECT r.name as nameRestaurant, SUM(p.totalAmount) as totalSales, COUNT(p.id) as quantityOrders FROM Restaurant r LEFT JOIN CustomerOrder p ON r.id = p.restaurant.id GROUP BY r.id, r.name")
+    @Query(value = "SELECT r.name AS restaurantName, COALESCE(SUM(o.total_amount), 0) AS totalSales, COUNT(DISTINCT o.id) AS totalCustomersOrders FROM restaurants r LEFT JOIN products p ON p.restaurant_id = r.id LEFT JOIN order_item oi ON oi.product_id = p.id LEFT JOIN customers_orders o ON o.id = oi.customer_order_id GROUP BY r.id, r.name", nativeQuery = true)
     List<SalesReport> salesReportByRestaurant();
 }

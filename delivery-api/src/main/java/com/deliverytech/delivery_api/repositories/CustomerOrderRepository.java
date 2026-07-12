@@ -15,7 +15,8 @@ public interface CustomerOrderRepository extends JpaRepository<CustomerOrder, Lo
 
     List<CustomerOrder> findByCustomerId(Long customerId);
 
-    List<CustomerOrder> findByRestaurantId(Long restaurantId);
+    @Query("SELECT DISTINCT o FROM CustomerOrder o JOIN o.orderItems oi WHERE oi.product.restaurant.id = :restaurantId")
+    List<CustomerOrder> findByRestaurantId(@Param("restaurantId") Long restaurantId);
 
     List<CustomerOrder> findByStatus(StatusOrder status);
 
@@ -23,12 +24,13 @@ public interface CustomerOrderRepository extends JpaRepository<CustomerOrder, Lo
             LocalDateTime start,
             LocalDateTime end);
 
-    @Query("SELECT c.restaurant.id, SUM(c.totalValue) FROM customers_orders c GROUP BY c.restaurant.id")
+    @Query("SELECT oi.product.restaurant.id, SUM(o.totalAmount) FROM CustomerOrder o JOIN o.orderItems oi GROUP BY oi.product.restaurant.id")
     List<Object[]> calcTotalSalesByRestaurant();
 
-    @Query("SELECT c FROM customers_orders c WHERE c.totalValue >= :value")
+    @Query("SELECT c FROM CustomerOrder c WHERE c.totalAmount >= :value")
     List<CustomerOrder> findByOrdersValuesGreaterThanOrEqual(@Param("value") BigDecimal value);
 
-    @Query("SELECT c FROM customers_orders c WHERE c.orderDate BETWEEN :start AND :end AND c.status = :status ORDER BY c.orderDate DESC")
-    List<CustomerOrder> reportByPeriodAndStatus(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("status") StatusOrder status);
+    @Query("SELECT c FROM CustomerOrder c WHERE c.orderDate BETWEEN :start AND :end AND c.status = :status ORDER BY c.orderDate DESC")
+    List<CustomerOrder> reportByPeriodAndStatus(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end,
+            @Param("status") StatusOrder status);
 }

@@ -32,10 +32,14 @@ public class Restaurant {
     private String phone;
     private BigDecimal deliveryFee;
 
-    public Restaurant(String name, String category, Boolean active, Double rating) {
+    public Restaurant(String name, String category, Boolean active, Double rating, String address, String phone,
+            BigDecimal deliveryFee) {
         this.name = name;
         this.category = category;
         this.active = active;
         this.rating = rating;
+        this.address = address;
+        this.phone = phone;
+        this.deliveryFee = deliveryFee;
     }
 }
