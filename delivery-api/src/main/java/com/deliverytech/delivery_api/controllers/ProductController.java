@@ -3,7 +3,7 @@ package com.deliverytech.delivery_api.controllers;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.deliverytech.delivery_api.models.Product;
+import com.deliverytech.delivery_api.models.entity.Product;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -13,15 +13,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
-
 @RestController
 @RequestMapping("/products")
 public class ProductController {
     @PostMapping
     public Product insertProduct(@RequestBody Product entity) {
-        //TODO: process POST request
-        
+        // TODO: process POST request
+
         return entity;
     }
 
@@ -34,7 +32,7 @@ public class ProductController {
     public Product getProductById(@PathVariable Long id) {
         return new Product();
     }
-    
+
     @GetMapping("/{restaurant}")
     public String getProductsByRestaurant(@PathVariable String restaurant) {
         return new String();
@@ -42,13 +40,13 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public String updateProduct(@PathVariable String id, @RequestBody String entity) {
-        //TODO: process PUT request
+        // TODO: process PUT request
         return entity;
     }
-    
+
     @DeleteMapping("/{id}")
     public String deleteProduct(@PathVariable String id) {
-        //TODO: process DELETE request
+        // TODO: process DELETE request
         return new String();
     }
 }

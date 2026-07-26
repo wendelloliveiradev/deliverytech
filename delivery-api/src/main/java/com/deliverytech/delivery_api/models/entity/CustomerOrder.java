@@ -1,6 +1,6 @@
-package com.deliverytech.delivery_api.models;
+package com.deliverytech.delivery_api.models.entity;
 
-import com.deliverytech.delivery_api.utils.StatusOrder;
+import com.deliverytech.delivery_api.models.enums.CustomerOrderStatus;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +23,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 @Entity
 @Table(name = "customers_orders")
@@ -39,7 +40,7 @@ public class CustomerOrder {
     private LocalDateTime orderDate;
 
     @Enumerated(EnumType.STRING)
-    private StatusOrder status;
+    private CustomerOrderStatus status;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
@@ -50,13 +51,16 @@ public class CustomerOrder {
     @OneToMany(mappedBy = "customerOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
 
+    @Version
+    private Long version; // Para controle otimista de concorrência
+
     @PrePersist
     private void prePersist() {
         this.orderDate = LocalDateTime.now();
     }
 
     public CustomerOrder(LocalDateTime orderDate,
-            StatusOrder status,
+            CustomerOrderStatus status,
             Customer customer,
             BigDecimal totalAmount,
             List<OrderItem> orderItems) {

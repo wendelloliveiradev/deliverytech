@@ -1,6 +1,6 @@
 package com.deliverytech.delivery_api.services;
 
-import com.deliverytech.delivery_api.models.Customer;
+import com.deliverytech.delivery_api.models.entity.Customer;
 import com.deliverytech.delivery_api.repositories.CustomerRepository;
 
 import jakarta.persistence.EntityNotFoundException;

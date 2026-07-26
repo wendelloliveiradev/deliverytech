@@ -1,10 +1,10 @@
 package com.deliverytech.delivery_api.services;
 
-import com.deliverytech.delivery_api.models.Customer;
-import com.deliverytech.delivery_api.models.CustomerOrder;
+import com.deliverytech.delivery_api.models.entity.Customer;
+import com.deliverytech.delivery_api.models.entity.CustomerOrder;
+import com.deliverytech.delivery_api.models.enums.CustomerOrderStatus;
 import com.deliverytech.delivery_api.repositories.CustomerRepository;
 import com.deliverytech.delivery_api.repositories.CustomerOrderRepository;
-import com.deliverytech.delivery_api.utils.StatusOrder;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -39,7 +39,7 @@ public class CustomerOrderService {
         }
 
         if (order.getStatus() == null) {
-            order.setStatus(StatusOrder.CONFIRMED);
+            order.setStatus(CustomerOrderStatus.CONFIRMED);
         }
 
         return customerOrderRepository.save(order);
@@ -68,7 +68,7 @@ public class CustomerOrderService {
     /**
      * Finds orders by status.
      */
-    public List<CustomerOrder> findByStatus(StatusOrder status) {
+    public List<CustomerOrder> findByStatus(CustomerOrderStatus status) {
 
         if (status == null) {
             throw new IllegalArgumentException(
@@ -105,7 +105,7 @@ public class CustomerOrderService {
      */
     public CustomerOrder changeStatus(
             Long orderId,
-            StatusOrder newStatus) {
+            CustomerOrderStatus newStatus) {
 
         CustomerOrder order = findById(orderId);
 
@@ -125,7 +125,7 @@ public class CustomerOrderService {
 
         return changeStatus(
                 orderId,
-                StatusOrder.CANCELLED);
+                CustomerOrderStatus.CANCELLED);
     }
 
     /**
@@ -171,20 +171,20 @@ public class CustomerOrderService {
      * Validates status transitions.
      */
     private void validateStatusTransition(
-            StatusOrder current,
-            StatusOrder next) {
+            CustomerOrderStatus current,
+            CustomerOrderStatus next) {
 
         if (next == null) {
             throw new IllegalArgumentException(
                     "New status is required.");
         }
 
-        if (current == StatusOrder.CANCELLED) {
+        if (current == CustomerOrderStatus.CANCELLED) {
             throw new IllegalArgumentException(
                     "Cancelled orders cannot be modified.");
         }
 
-        if (current == StatusOrder.DELIVERED) {
+        if (current == CustomerOrderStatus.DELIVERED) {
             throw new IllegalArgumentException(
                     "Delivered orders cannot be modified.");
         }

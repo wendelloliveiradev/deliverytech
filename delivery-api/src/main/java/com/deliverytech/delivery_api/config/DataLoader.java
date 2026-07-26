@@ -1,7 +1,8 @@
 package com.deliverytech.delivery_api.config;
 
 import com.deliverytech.delivery_api.models.*;
-import com.deliverytech.delivery_api.utils.StatusOrder;
+import com.deliverytech.delivery_api.models.entity.Customer;
+import com.deliverytech.delivery_api.models.entity.Restaurant;
 
 import lombok.RequiredArgsConstructor;
 

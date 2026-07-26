@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.deliverytech.delivery_api.models.Customer;
+import com.deliverytech.delivery_api.models.entity.Customer;
 import com.deliverytech.delivery_api.services.CustomerService;
 
 import jakarta.validation.Valid;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomerController {
     private final CustomerService clientService;
-    
+
     @PostMapping
     public ResponseEntity<?> registerCustomer(@Valid @RequestBody Customer customer) {
         try {
@@ -50,15 +50,15 @@ public class CustomerController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable String id, @RequestBody Customer customer) {
-        
+
         return ResponseEntity.ok(clientService.update(Long.parseLong(id), customer));
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCustomer(@PathVariable String id) {
         clientService.inactivate(Long.parseLong(id));
 
         return ResponseEntity.ok("Customer deleted successfully");
     }
-    
+
 }

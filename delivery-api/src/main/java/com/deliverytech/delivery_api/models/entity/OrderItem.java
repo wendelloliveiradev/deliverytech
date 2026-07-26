@@ -1,4 +1,4 @@
-package com.deliverytech.delivery_api.models;
+package com.deliverytech.delivery_api.models.entity;
 
 import java.math.BigDecimal;
 

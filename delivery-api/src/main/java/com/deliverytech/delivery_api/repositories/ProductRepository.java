@@ -2,7 +2,7 @@ package com.deliverytech.delivery_api.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.deliverytech.delivery_api.models.Product;
+import com.deliverytech.delivery_api.models.entity.Product;
 
 import java.util.List;
 

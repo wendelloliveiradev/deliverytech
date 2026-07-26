@@ -3,7 +3,7 @@ package com.deliverytech.delivery_api.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.deliverytech.delivery_api.models.Restaurant;
+import com.deliverytech.delivery_api.models.entity.Restaurant;
 
 import java.util.List;
 
