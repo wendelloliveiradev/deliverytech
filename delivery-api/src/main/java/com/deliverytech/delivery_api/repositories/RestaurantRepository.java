@@ -13,7 +13,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 
     List<Restaurant> findByCategory(String category);
 
-    List<Restaurant> findByActive(Boolean active);
+    List<Restaurant> findByActiveTrue();
 
     List<Restaurant> findAllByOrderByRatingDesc();
 

@@ -109,9 +109,7 @@ public class CustomerOrderService {
 
         CustomerOrder order = findById(orderId);
 
-        validateStatusTransition(
-                order.getStatus(),
-                newStatus);
+        order.getStatus().ensureTransitionTo(newStatus);
 
         order.setStatus(newStatus);
 
@@ -165,28 +163,5 @@ public class CustomerOrderService {
         }
 
         return customer;
-    }
-
-    /**
-     * Validates status transitions.
-     */
-    private void validateStatusTransition(
-            CustomerOrderStatus current,
-            CustomerOrderStatus next) {
-
-        if (next == null) {
-            throw new IllegalArgumentException(
-                    "New status is required.");
-        }
-
-        if (current == CustomerOrderStatus.CANCELLED) {
-            throw new IllegalArgumentException(
-                    "Cancelled orders cannot be modified.");
-        }
-
-        if (current == CustomerOrderStatus.DELIVERED) {
-            throw new IllegalArgumentException(
-                    "Delivered orders cannot be modified.");
-        }
     }
 }

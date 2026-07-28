@@ -75,7 +75,7 @@ public class RestaurantService {
      * Returns all active restaurants.
      */
     public List<Restaurant> findAllActive() {
-        return restaurantRepository.findByActive(true);
+        return restaurantRepository.findByActiveTrue();
     }
 
     /**

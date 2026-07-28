@@ -74,7 +74,7 @@ public class ProductService {
      * Finds all available products.
      */
     public List<Product> findAvailableProducts() {
-        return productRepository.findByAvailable(true);
+        return productRepository.findByAvailableTrue();
     }
 
     /**

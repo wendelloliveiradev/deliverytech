@@ -93,7 +93,7 @@ public class DataLoader implements CommandLineRunner {
 
         System.out.println("Cliente por email: " +
                 clienteByEmail.map(Customer::getName).orElse("Não encontrado"));
-        var clientesAtivos = customerRepository.findByActive(true);
+        var clientesAtivos = customerRepository.findByActiveTrue(true);
 
         System.out.println("Clientes ativos: " + clientesAtivos.size());
         var clientesPorNome = customerRepository.findByNameContainingIgnoreCase("silva");
