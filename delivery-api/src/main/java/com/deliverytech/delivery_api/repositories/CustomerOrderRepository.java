@@ -20,15 +20,29 @@ public interface CustomerOrderRepository extends JpaRepository<CustomerOrder, Lo
 
         List<CustomerOrder> findByStatus(CustomerOrderStatus status);
 
-        List<CustomerOrder> findByOrderDateBetween(
-                        LocalDateTime start,
-                        LocalDateTime end);
+        @Query("SELECT c FROM CustomerOrder c WHERE c.orderDate BETWEEN :start AND :end ORDER BY c.orderDate DESC")
+        List<CustomerOrder> findByOrderDateBetweenDesc(
+                        @Param("start") LocalDateTime start,
+                        @Param("end") LocalDateTime end);
 
         @Query("SELECT oi.product.restaurant.id, SUM(o.totalAmount) FROM CustomerOrder o JOIN o.orderItems oi GROUP BY oi.product.restaurant.id")
         List<Object[]> calcTotalSalesByRestaurant();
 
         @Query("SELECT c FROM CustomerOrder c WHERE c.totalAmount >= :value")
         List<CustomerOrder> findByOrdersValuesGreaterThanOrEqual(@Param("value") BigDecimal value);
+
+        List<CustomerOrder> findTop10ByOrderByOrderDateDesc();
+
+        @Query("""
+                        SELECT DISTINCT o
+                        FROM CustomerOrder o
+                        LEFT JOIN FETCH o.customer
+                        LEFT JOIN FETCH o.orderItems oi
+                        LEFT JOIN FETCH oi.product p
+                        LEFT JOIN FETCH p.restaurant
+                        ORDER BY o.orderDate DESC
+                        """)
+        List<CustomerOrder> findAllWithDetails();
 
         @Query("SELECT c FROM CustomerOrder c WHERE c.orderDate BETWEEN :start AND :end AND c.status = :status ORDER BY c.orderDate DESC")
         List<CustomerOrder> reportByPeriodAndStatus(@Param("start") LocalDateTime start,

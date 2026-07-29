@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.deliverytech.delivery_api.models.entity.Restaurant;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
@@ -14,6 +15,10 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
     List<Restaurant> findByCategory(String category);
 
     List<Restaurant> findByActiveTrue();
+
+    List<Restaurant> findByDeliveryFeeLessThanEqual(BigDecimal deliveryFee);
+
+    List<Restaurant> findTop5ByOrderByNameAsc();
 
     List<Restaurant> findAllByOrderByRatingDesc();
 

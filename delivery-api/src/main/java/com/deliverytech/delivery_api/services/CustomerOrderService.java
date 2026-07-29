@@ -95,7 +95,7 @@ public class CustomerOrderService {
                     "Start date cannot be after end date.");
         }
 
-        return customerOrderRepository.findByOrderDateBetween(
+        return customerOrderRepository.findByOrderDateBetweenDesc(
                 start,
                 end);
     }

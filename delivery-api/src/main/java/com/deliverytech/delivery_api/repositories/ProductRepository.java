@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.deliverytech.delivery_api.models.entity.Product;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
@@ -13,4 +14,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategory(String category);
 
     List<Product> findByAvailableTrue();
+
+    List<Product> findByPriceLessThanEqual(BigDecimal price);
 }
