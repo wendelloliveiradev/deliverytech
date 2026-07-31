@@ -1,43 +1,88 @@
 # Delivery Tech API
 
-Sistema de delivery desenvolvido com Spring Boot e Java 21.
+Spring Boot REST API for a delivery domain. The project models customers, restaurants, products, orders, and order items, uses an in-memory H2 database, and seeds sample data on startup.
 
-## 🚀 Tecnologias
+## Current Status
 
-- **Java 21 LTS** (versão mais recente)
-- Spring Boot 3.2.x
-- Spring Web
+- Customer CRUD is implemented through `/customers`.
+- Domain services exist for customers, restaurants, products, and orders.
+- The `/restaurants`, `/products`, and `/customers-orders` controllers are scaffolds and are not production-ready endpoints yet.
+
+## Stack
+
+- Spring Boot 4.0.6
+- Java 25, as configured in `pom.xml`
+- Spring WebMVC
 - Spring Data JPA
+- Spring Validation
 - H2 Database
-- Maven
+- Lombok
+- Maven Wrapper
 
-## ⚡ Recursos Modernos Utilizados
+## Run Locally
 
-- Records (Java 14+)
-- Text Blocks (Java 15+)
-- Pattern Matching (Java 17+)
-- Virtual Threads (Java 21)
+1. Install JDK 25.
+2. From the `delivery-api/` directory, run `./mvnw spring-boot:run`.
+3. Open `http://localhost:8080/h2-console` if you want to inspect the database.
 
-## 🏃‍♂️ Como executar
+## Configuration
 
-1. **Pré-requisitos:** JDK 21 instalado
-2. Clone o repositório
-3. Execute: `./mvnw spring-boot:run`
-4. Acesse: http://localhost:8080/health
+- Server port: `8080`
+- Database: in-memory H2 at `jdbc:h2:mem:deliverydb`
+- H2 console: `/h2-console`
+- Schema mode: `create-drop`
+- SQL logging: enabled for development
+- Open Session in View: disabled
 
-## 📋 Endpoints
+## Seed Data
 
-- GET /health - Status da aplicação (inclui versão Java)
-- GET /info - Informações da aplicação
-- GET /h2-console - Console do banco H2
+On startup, `DataLoader` inserts:
 
-## 🔧 Configuração
+- 3 customers
+- 2 restaurants
+- 5 products
+- 2 customer orders
 
-- Porta: 8080
-- Banco: H2 em memória
-- Profile: development
+## Implemented API
 
-## 👨‍💻 Desenvolvedor
+### Customers
 
-[Seu Nome] - [Sua Turma]  
-Desenvolvido com JDK 21 e Spring Boot 3.2.x
+- `POST /customers`
+- `GET /customers`
+- `GET /customers/{id}`
+- `PUT /customers/{id}`
+- `DELETE /customers/{id}`
+
+### Customer rules
+
+- Email must be unique.
+- New customers default to active when the flag is omitted.
+- Listing customers returns only active records.
+- Deletion is implemented as inactivation.
+
+## Domain Rules
+
+- Customers must be active to place orders.
+- Product prices must be greater than zero.
+- Restaurant ratings must stay between 0 and 5.
+- Order status transitions are validated by `CustomerOrderStatus`.
+
+## Order Status Flow
+
+Valid transitions are:
+
+- `PENDING` -> `CONFIRMED` or `CANCELLED`
+- `CONFIRMED` -> `PREPARING` or `CANCELLED`
+- `PREPARING` -> `SHIPPED` or `CANCELLED`
+- `SHIPPED` -> `DELIVERED`
+
+## Documentation
+
+- See [docs/README.md](../docs/README.md) for the documentation index.
+- See [docs/current-state.md](../docs/current-state.md) for the current implementation map and domain overview.
+
+## Notes
+
+- The project currently exposes model entities directly from the controller layer.
+- There is no dedicated health endpoint in the current codebase.
+- The default test suite only includes the Spring Boot context smoke test.
