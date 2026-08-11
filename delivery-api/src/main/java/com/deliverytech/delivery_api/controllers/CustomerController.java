@@ -1,5 +1,7 @@
 package com.deliverytech.delivery_api.controllers;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,11 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.deliverytech.delivery_api.models.entity.Customer;
-import com.deliverytech.delivery_api.services.CustomerService;
+import com.deliverytech.delivery_api.dtos.CustomerRequestDto;
+import com.deliverytech.delivery_api.dtos.CustomerResponseDto;
+import com.deliverytech.delivery_api.services.interfaces.CustomerService;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
-import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,42 +26,55 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/customers")
 @RequiredArgsConstructor
 public class CustomerController {
-    private final CustomerService clientService;
+    private final CustomerService customerService;
 
     @PostMapping
-    public ResponseEntity<?> registerCustomer(@Valid @RequestBody Customer customer) {
+    public ResponseEntity<?> registerCustomer(@Valid @RequestBody CustomerRequestDto customerDto) {
         try {
-            Customer saved_customer = clientService.register(customer);
+            CustomerResponseDto savedCustomer = customerService.register(customerDto);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(saved_customer);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedCustomer);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error registering customer");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
         }
     }
 
     @GetMapping
-    public ResponseEntity<List<Customer>> getCustomers() {
-        return ResponseEntity.ok(clientService.findAllActive());
+    public ResponseEntity<List<CustomerResponseDto>> getCustomers() {
+        return ResponseEntity.ok(customerService.findAllActive());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Customer> getCustomerById(@PathVariable String id) {
-        return ResponseEntity.ok(clientService.findById(Long.parseLong(id)));
+    public ResponseEntity<?> getCustomerById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(customerService.findById(id));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable String id, @RequestBody Customer customer) {
-
-        return ResponseEntity.ok(clientService.update(Long.parseLong(id), customer));
+    public ResponseEntity<?> updateCustomer(@PathVariable Long id, @Valid @RequestBody CustomerRequestDto customerDto) {
+        try {
+            return ResponseEntity.ok(customerService.update(id, customerDto));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteCustomer(@PathVariable String id) {
-        clientService.inactivate(Long.parseLong(id));
-
-        return ResponseEntity.ok("Customer deleted successfully");
+    public ResponseEntity<?> deleteCustomer(@PathVariable Long id) {
+        try {
+            customerService.inactivate(id);
+            return ResponseEntity.ok("Customer deleted successfully");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
-
 }
