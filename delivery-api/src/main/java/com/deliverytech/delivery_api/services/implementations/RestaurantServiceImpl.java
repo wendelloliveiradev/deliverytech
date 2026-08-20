@@ -1,7 +1,7 @@
 package com.deliverytech.delivery_api.services.implementations;
 
-import com.deliverytech.delivery_api.dtos.RestaurantRequestDto;
-import com.deliverytech.delivery_api.dtos.RestaurantResponseDto;
+import com.deliverytech.delivery_api.dtos.requests.RestaurantRequestDto;
+import com.deliverytech.delivery_api.dtos.responses.RestaurantResponseDto;
 import com.deliverytech.delivery_api.mappers.RestaurantMapper;
 import com.deliverytech.delivery_api.models.entity.Restaurant;
 import com.deliverytech.delivery_api.repositories.RestaurantRepository;
@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -105,30 +106,51 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public void inactivate(Long id) {
-        Restaurant restaurant = restaurantRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Restaurant not found with ID: " + id));
-
-        if (!Boolean.TRUE.equals(restaurant.getActive())) {
-            throw new IllegalArgumentException("Restaurant is already inactive.");
-        }
-
-        restaurant.setActive(false);
-        restaurantRepository.save(restaurant);
-    }
-
-    @Override
     public void activate(Long id) {
         Restaurant restaurant = restaurantRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Restaurant not found with ID: " + id));
 
-        if (Boolean.TRUE.equals(restaurant.getActive())) {
+        if (restaurant.getActive() != null && restaurant.getActive()) {
             throw new IllegalArgumentException("Restaurant is already active.");
         }
 
         restaurant.setActive(true);
+
+        restaurantRepository.save(restaurant);
+    }
+
+    @Override
+    public void deactivate(Long id) {
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Restaurant not found with ID: " + id));
+
+        if (restaurant.getActive() != null && !restaurant.getActive()) {
+            throw new IllegalArgumentException("Restaurant is already inactive.");
+        }
+
+        restaurant.setActive(false);
+
+        restaurantRepository.save(restaurant);
+    }
+
+    @Override
+    public void calculateDeliveryFee(Long restaurantId, Double distance) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Restaurant not found with ID: " + restaurantId));
+
+        if (distance == null || distance < 0) {
+            throw new IllegalArgumentException("Distance must be a non-negative value.");
+        }
+
+        BigDecimal baseFee = BigDecimal.valueOf(5); // Base delivery fee
+        BigDecimal feePerKm = BigDecimal.valueOf(1); // Fee per kilometer
+        BigDecimal deliveryFee = baseFee.add(feePerKm.multiply(BigDecimal.valueOf(distance)));
+
+        restaurant.setDeliveryFee(deliveryFee);
+
         restaurantRepository.save(restaurant);
     }
 

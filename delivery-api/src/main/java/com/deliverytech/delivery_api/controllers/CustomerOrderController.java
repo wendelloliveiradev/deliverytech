@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.deliverytech.delivery_api.dtos.CustomerOrderCreateRequestDto;
-import com.deliverytech.delivery_api.dtos.CustomerOrderStatusUpdateRequestDto;
+import com.deliverytech.delivery_api.dtos.requests.CustomerOrderCreateRequestDto;
+import com.deliverytech.delivery_api.dtos.requests.CustomerOrderStatusUpdateRequestDto;
 import com.deliverytech.delivery_api.models.enums.CustomerOrderStatus;
 import com.deliverytech.delivery_api.services.interfaces.CustomerOrderService;
 

@@ -7,8 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.deliverytech.delivery_api.dtos.RestaurantRequestDto;
-import com.deliverytech.delivery_api.dtos.RestaurantResponseDto;
+import com.deliverytech.delivery_api.dtos.requests.RestaurantRequestDto;
+import com.deliverytech.delivery_api.dtos.responses.RestaurantResponseDto;
 import com.deliverytech.delivery_api.services.interfaces.RestaurantService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -97,7 +97,7 @@ public class RestaurantController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteRestaurant(@PathVariable Long id) {
         try {
-            restaurantService.inactivate(id);
+            restaurantService.deactivate(id);
             return ResponseEntity.ok("Restaurant inactivated");
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

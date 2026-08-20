@@ -1,8 +1,8 @@
 package com.deliverytech.delivery_api.services.implementations;
 
-import com.deliverytech.delivery_api.dtos.CustomerOrderCreateRequestDto;
-import com.deliverytech.delivery_api.dtos.CustomerOrderResponseDto;
-import com.deliverytech.delivery_api.dtos.OrderItemRequestDto;
+import com.deliverytech.delivery_api.dtos.requests.CustomerOrderCreateRequestDto;
+import com.deliverytech.delivery_api.dtos.requests.OrderItemRequestDto;
+import com.deliverytech.delivery_api.dtos.responses.CustomerOrderResponseDto;
 import com.deliverytech.delivery_api.mappers.CustomerOrderMapper;
 import com.deliverytech.delivery_api.models.entity.Customer;
 import com.deliverytech.delivery_api.models.entity.CustomerOrder;

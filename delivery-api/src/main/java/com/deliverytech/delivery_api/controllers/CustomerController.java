@@ -13,14 +13,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.deliverytech.delivery_api.dtos.CustomerRequestDto;
-import com.deliverytech.delivery_api.dtos.CustomerResponseDto;
+import com.deliverytech.delivery_api.dtos.requests.CustomerRequestDto;
+import com.deliverytech.delivery_api.dtos.responses.CustomerResponseDto;
 import com.deliverytech.delivery_api.services.interfaces.CustomerService;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/customers")
@@ -41,6 +42,22 @@ public class CustomerController {
         }
     }
 
+    // TODO: implement a method to get all customer orders for a specific customer
+    /***
+     * get all customer orders
+     * 
+     * @param customerId the ID of the customer
+     * @return a list of all customer orders for the specified customer
+     */
+    @PostMapping("/{customerId}/customer-orders")
+    public ResponseEntity<?> getCustomerOrders(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(customerService.findById(id));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
     @GetMapping
     public ResponseEntity<List<CustomerResponseDto>> getCustomers() {
         return ResponseEntity.ok(customerService.findAllActive());
@@ -50,6 +67,15 @@ public class CustomerController {
     public ResponseEntity<?> getCustomerById(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(customerService.findById(id));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<?> getCustomerByEmail(@RequestParam String email) {
+        try {
+            return ResponseEntity.ok(customerService.findByEmail(email));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
@@ -69,7 +95,7 @@ public class CustomerController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCustomer(@PathVariable Long id) {
         try {
-            customerService.inactivate(id);
+            customerService.deactivate(id);
             return ResponseEntity.ok("Customer deleted successfully");
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

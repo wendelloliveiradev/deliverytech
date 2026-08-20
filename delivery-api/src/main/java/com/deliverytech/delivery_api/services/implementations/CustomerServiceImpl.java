@@ -1,7 +1,7 @@
 package com.deliverytech.delivery_api.services.implementations;
 
-import com.deliverytech.delivery_api.dtos.CustomerRequestDto;
-import com.deliverytech.delivery_api.dtos.CustomerResponseDto;
+import com.deliverytech.delivery_api.dtos.requests.CustomerRequestDto;
+import com.deliverytech.delivery_api.dtos.responses.CustomerResponseDto;
 import com.deliverytech.delivery_api.mappers.CustomerMapper;
 import com.deliverytech.delivery_api.models.entity.Customer;
 import com.deliverytech.delivery_api.repositories.CustomerRepository;
@@ -95,17 +95,31 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void inactivate(Long id) {
+    public void activate(Long id) {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Customer not found with ID: " + id));
 
-        if (!Boolean.TRUE.equals(customer.getActive())) {
-            throw new IllegalArgumentException(
-                    "Customer is already inactive.");
+        if (customer.getActive() != null && customer.getActive()) {
+            throw new IllegalArgumentException("Customer is already active.");
         }
 
-        customer.setActive(false);
+        customer.setActive(!customer.getActive());
+
+        customerRepository.save(customer);
+    }
+
+    @Override
+    public void deactivate(Long id) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Customer not found with ID: " + id));
+
+        if (customer.getActive() != null && !customer.getActive()) {
+            throw new IllegalArgumentException("Customer is already inactive.");
+        }
+
+        customer.setActive(!customer.getActive());
 
         customerRepository.save(customer);
     }

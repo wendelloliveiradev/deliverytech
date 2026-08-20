@@ -7,8 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.deliverytech.delivery_api.dtos.ProductRequestDto;
-import com.deliverytech.delivery_api.dtos.ProductResponseDto;
+import com.deliverytech.delivery_api.dtos.requests.ProductRequestDto;
+import com.deliverytech.delivery_api.dtos.responses.ProductResponseDto;
 import com.deliverytech.delivery_api.services.interfaces.ProductService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -68,6 +68,15 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/category/{category}")
+    public ResponseEntity<?> getProductsByCategory(@PathVariable String category) {
+        try {
+            return ResponseEntity.ok(productService.findByCategory(category));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequestDto dto) {
         try {
@@ -81,6 +90,18 @@ public class ProductController {
 
     @PatchMapping("/{id}/available")
     public ResponseEntity<?> makeAvailable(@PathVariable Long id) {
+        try {
+            productService.makeAvailable(id);
+            return ResponseEntity.ok("Product is now available");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PatchMapping("/{id}/available")
+    public ResponseEntity<?> makeUnavailable(@PathVariable Long id) {
         try {
             productService.makeAvailable(id);
             return ResponseEntity.ok("Product is now available");

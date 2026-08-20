@@ -16,56 +16,56 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.deliverytech.delivery_api.dtos.ProductResponseDto;
+import com.deliverytech.delivery_api.dtos.responses.ProductResponseDto;
 import com.deliverytech.delivery_api.services.interfaces.ProductService;
 
 @WebMvcTest(ProductController.class)
 class ProductControllerWebMvcTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @MockitoBean
-    private ProductService productService;
+        @MockitoBean
+        private ProductService productService;
 
-    @Test
-    void insertProduct_whenInvalidPayload_shouldReturnBadRequest() throws Exception {
-        String payload = """
-                {
-                  "name": "",
-                  "category": "",
-                  "price": -1,
-                  "available": true
-                }
-                """;
+        @Test
+        void insertProduct_whenInvalidPayload_shouldReturnBadRequest() throws Exception {
+                String payload = """
+                                {
+                                  "name": "",
+                                  "category": "",
+                                  "price": -1,
+                                  "available": true
+                                }
+                                """;
 
-        mockMvc.perform(post("/products")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(payload))
-                .andExpect(status().isBadRequest());
-    }
+                mockMvc.perform(post("/products")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(payload))
+                                .andExpect(status().isBadRequest());
+        }
 
-    @Test
-    void getProductById_shouldReturnProductResponseShape() throws Exception {
-        ProductResponseDto responseDto = new ProductResponseDto(
-                8L,
-                "Pizza",
-                "Food",
-                new BigDecimal("39.90"),
-                true,
-                2L);
+        @Test
+        void getProductById_shouldReturnProductResponseShape() throws Exception {
+                ProductResponseDto responseDto = new ProductResponseDto(
+                                8L,
+                                "Pizza",
+                                "Food",
+                                new BigDecimal("39.90"),
+                                true,
+                                2L);
 
-        when(productService.findById(8L)).thenReturn(responseDto);
+                when(productService.findById(8L)).thenReturn(responseDto);
 
-        mockMvc.perform(get("/products/8"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(8))
-                .andExpect(jsonPath("$.name").value("Pizza"))
-                .andExpect(jsonPath("$.category").value("Food"))
-                .andExpect(jsonPath("$.price").value(39.90))
-                .andExpect(jsonPath("$.available").value(true))
-                .andExpect(jsonPath("$.restaurantId").value(2));
+                mockMvc.perform(get("/products/8"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.id").value(8))
+                                .andExpect(jsonPath("$.name").value("Pizza"))
+                                .andExpect(jsonPath("$.category").value("Food"))
+                                .andExpect(jsonPath("$.price").value(39.90))
+                                .andExpect(jsonPath("$.available").value(true))
+                                .andExpect(jsonPath("$.restaurantId").value(2));
 
-        verify(productService).findById(8L);
-    }
+                verify(productService).findById(8L);
+        }
 }

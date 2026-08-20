@@ -1,7 +1,7 @@
 package com.deliverytech.delivery_api.services.implementations;
 
-import com.deliverytech.delivery_api.dtos.ProductRequestDto;
-import com.deliverytech.delivery_api.dtos.ProductResponseDto;
+import com.deliverytech.delivery_api.dtos.requests.ProductRequestDto;
+import com.deliverytech.delivery_api.dtos.responses.ProductResponseDto;
 import com.deliverytech.delivery_api.mappers.ProductMapper;
 import com.deliverytech.delivery_api.models.entity.Product;
 import com.deliverytech.delivery_api.models.entity.Restaurant;
@@ -96,30 +96,32 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void makeUnavailable(Long id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Product not found with ID: " + id));
-
-        if (!Boolean.TRUE.equals(product.getAvailable())) {
-            throw new IllegalArgumentException("Product is already unavailable.");
-        }
-
-        product.setAvailable(false);
-        productRepository.save(product);
-    }
-
-    @Override
     public void makeAvailable(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Product not found with ID: " + id));
 
-        if (Boolean.TRUE.equals(product.getAvailable())) {
+        if (product.getAvailable() != null && product.getAvailable()) {
             throw new IllegalArgumentException("Product is already available.");
         }
 
         product.setAvailable(true);
+
+        productRepository.save(product);
+    }
+
+    @Override
+    public void makeUnavailable(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Product not found with ID: " + id));
+
+        if (product.getAvailable() != null && !product.getAvailable()) {
+            throw new IllegalArgumentException("Product is already unavailable.");
+        }
+
+        product.setAvailable(false);
+
         productRepository.save(product);
     }
 
