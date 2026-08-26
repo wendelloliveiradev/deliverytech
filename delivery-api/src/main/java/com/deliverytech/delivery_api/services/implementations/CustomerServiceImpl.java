@@ -2,12 +2,14 @@ package com.deliverytech.delivery_api.services.implementations;
 
 import com.deliverytech.delivery_api.dtos.requests.CustomerRequestDto;
 import com.deliverytech.delivery_api.dtos.responses.CustomerResponseDto;
+import com.deliverytech.delivery_api.exceptions.BusinessException;
+import com.deliverytech.delivery_api.exceptions.EntityNotFoundException;
+import com.deliverytech.delivery_api.exceptions.ValidationException;
 import com.deliverytech.delivery_api.mappers.CustomerMapper;
 import com.deliverytech.delivery_api.models.entity.Customer;
 import com.deliverytech.delivery_api.repositories.CustomerRepository;
 import com.deliverytech.delivery_api.services.interfaces.CustomerService;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -16,22 +18,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
 
     @Override
+    @Transactional
     public CustomerResponseDto register(CustomerRequestDto customerDto) {
         Customer customer = customerMapper.toEntity(customerDto);
         validateCustomerData(customer);
-
-        customerRepository.findByEmail(customer.getEmail())
-                .ifPresent(c -> {
-                    throw new IllegalArgumentException(
-                            "A customer with this email already exists.");
-                });
+        ensureEmailIsUnique(customer.getEmail(), null);
 
         if (customer.getActive() == null) {
             customer.setActive(true);
@@ -67,6 +65,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @Transactional
     public CustomerResponseDto update(Long id, CustomerRequestDto updatedCustomerDto) {
         Customer existingCustomer = customerRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -75,14 +74,7 @@ public class CustomerServiceImpl implements CustomerService {
         Customer updatedCustomer = customerMapper.toEntity(updatedCustomerDto);
 
         validateCustomerData(updatedCustomer);
-
-        customerRepository.findByEmail(updatedCustomer.getEmail())
-                .ifPresent(customer -> {
-                    if (!customer.getId().equals(id)) {
-                        throw new IllegalArgumentException(
-                                "Email is already in use by another customer.");
-                    }
-                });
+        ensureEmailIsUnique(updatedCustomer.getEmail(), id);
 
         existingCustomer.setName(updatedCustomer.getName());
         existingCustomer.setEmail(updatedCustomer.getEmail());
@@ -95,55 +87,49 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @Transactional
     public void activate(Long id) {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Customer not found with ID: " + id));
 
-        if (customer.getActive() != null && customer.getActive()) {
-            throw new IllegalArgumentException("Customer is already active.");
+        if (Boolean.TRUE.equals(customer.getActive())) {
+            throw new BusinessException("Customer is already active.");
         }
 
-        customer.setActive(!customer.getActive());
+        customer.setActive(true);
 
         customerRepository.save(customer);
     }
 
     @Override
+    @Transactional
     public void deactivate(Long id) {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Customer not found with ID: " + id));
 
-        if (customer.getActive() != null && !customer.getActive()) {
-            throw new IllegalArgumentException("Customer is already inactive.");
+        if (!Boolean.TRUE.equals(customer.getActive())) {
+            throw new BusinessException("Customer is already inactive.");
         }
 
-        customer.setActive(!customer.getActive());
+        customer.setActive(false);
 
         customerRepository.save(customer);
     }
 
     private void validateCustomerData(Customer customer) {
         if (customer == null) {
-            throw new IllegalArgumentException("Customer cannot be null.");
-        }
-
-        if (customer.getName() == null || customer.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Customer name is required.");
-        }
-
-        if (customer.getEmail() == null || customer.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("Email is required.");
-        }
-
-        if (!isValidEmail(customer.getEmail())) {
-            throw new IllegalArgumentException("Invalid email format.");
+            throw new ValidationException("Customer cannot be null.");
         }
     }
 
-    private boolean isValidEmail(String email) {
-        String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-        return email.matches(regex);
+    /** Enforces that no two different customers share the same email. */
+    private void ensureEmailIsUnique(String email, Long customerIdBeingUpdated) {
+        customerRepository.findByEmail(email)
+                .filter(existing -> customerIdBeingUpdated == null || !existing.getId().equals(customerIdBeingUpdated))
+                .ifPresent(existing -> {
+                    throw new BusinessException("A customer with this email already exists.");
+                });
     }
 }

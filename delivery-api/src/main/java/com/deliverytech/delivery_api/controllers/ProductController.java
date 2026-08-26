@@ -13,7 +13,10 @@ import com.deliverytech.delivery_api.services.interfaces.ProductService;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
+@Validated
 public class ProductController {
     private final ProductService productService;
 
@@ -51,7 +55,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getProductById(@PathVariable Long id) {
+    public ResponseEntity<?> getProductById(@PathVariable @Positive Long id) {
         try {
             return ResponseEntity.ok(productService.findById(id));
         } catch (EntityNotFoundException e) {
@@ -60,7 +64,7 @@ public class ProductController {
     }
 
     @GetMapping("/restaurant/{restaurantId}")
-    public ResponseEntity<?> getProductsByRestaurant(@PathVariable Long restaurantId) {
+    public ResponseEntity<?> getProductsByRestaurant(@PathVariable @Positive Long restaurantId) {
         try {
             return ResponseEntity.ok(productService.findByRestaurant(restaurantId));
         } catch (EntityNotFoundException e) {
@@ -69,7 +73,7 @@ public class ProductController {
     }
 
     @GetMapping("/category/{category}")
-    public ResponseEntity<?> getProductsByCategory(@PathVariable String category) {
+    public ResponseEntity<?> getProductsByCategory(@PathVariable @NotBlank String category) {
         try {
             return ResponseEntity.ok(productService.findByCategory(category));
         } catch (IllegalArgumentException e) {
@@ -78,7 +82,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequestDto dto) {
+    public ResponseEntity<?> updateProduct(@PathVariable @Positive Long id, @Valid @RequestBody ProductRequestDto dto) {
         try {
             return ResponseEntity.ok(productService.update(id, dto));
         } catch (EntityNotFoundException e) {
@@ -89,7 +93,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}/available")
-    public ResponseEntity<?> makeAvailable(@PathVariable Long id) {
+    public ResponseEntity<?> makeAvailable(@PathVariable @Positive Long id) {
         try {
             productService.makeAvailable(id);
             return ResponseEntity.ok("Product is now available");
@@ -100,11 +104,11 @@ public class ProductController {
         }
     }
 
-    @PatchMapping("/{id}/available")
-    public ResponseEntity<?> makeUnavailable(@PathVariable Long id) {
+    @PatchMapping("/{id}/unavailable")
+    public ResponseEntity<?> makeUnavailable(@PathVariable @Positive Long id) {
         try {
-            productService.makeAvailable(id);
-            return ResponseEntity.ok("Product is now available");
+            productService.makeUnavailable(id);
+            return ResponseEntity.ok("Product is now unavailable");
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (IllegalArgumentException e) {
@@ -113,7 +117,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<?> deleteProduct(@PathVariable @Positive Long id) {
         try {
             productService.makeUnavailable(id);
             return ResponseEntity.ok("Product marked as unavailable");

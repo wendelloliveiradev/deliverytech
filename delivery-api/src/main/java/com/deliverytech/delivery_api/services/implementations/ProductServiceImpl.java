@@ -2,6 +2,9 @@ package com.deliverytech.delivery_api.services.implementations;
 
 import com.deliverytech.delivery_api.dtos.requests.ProductRequestDto;
 import com.deliverytech.delivery_api.dtos.responses.ProductResponseDto;
+import com.deliverytech.delivery_api.exceptions.BusinessException;
+import com.deliverytech.delivery_api.exceptions.EntityNotFoundException;
+import com.deliverytech.delivery_api.exceptions.ValidationException;
 import com.deliverytech.delivery_api.mappers.ProductMapper;
 import com.deliverytech.delivery_api.models.entity.Product;
 import com.deliverytech.delivery_api.models.entity.Restaurant;
@@ -9,22 +12,24 @@ import com.deliverytech.delivery_api.repositories.ProductRepository;
 import com.deliverytech.delivery_api.repositories.RestaurantRepository;
 import com.deliverytech.delivery_api.services.interfaces.ProductService;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final RestaurantRepository restaurantRepository;
     private final ProductMapper productMapper;
 
     @Override
+    @Transactional
     public ProductResponseDto register(ProductRequestDto productDto) {
         Restaurant restaurant = validateRestaurant(productDto.restaurantId());
         Product product = productMapper.toEntity(productDto, restaurant);
@@ -59,7 +64,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResponseDto> findByCategory(String category) {
         if (category == null || category.trim().isEmpty()) {
-            throw new IllegalArgumentException("Category is required.");
+            throw new ValidationException("Category is required.");
         }
 
         return productRepository.findByCategory(category).stream()
@@ -75,6 +80,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public ProductResponseDto update(Long id, ProductRequestDto updatedProductDto) {
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -96,13 +102,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public void makeAvailable(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Product not found with ID: " + id));
 
-        if (product.getAvailable() != null && product.getAvailable()) {
-            throw new IllegalArgumentException("Product is already available.");
+        if (Boolean.TRUE.equals(product.getAvailable())) {
+            throw new BusinessException("Product is already available.");
         }
 
         product.setAvailable(true);
@@ -111,13 +118,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public void makeUnavailable(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Product not found with ID: " + id));
 
-        if (product.getAvailable() != null && !product.getAvailable()) {
-            throw new IllegalArgumentException("Product is already unavailable.");
+        if (!Boolean.TRUE.equals(product.getAvailable())) {
+            throw new BusinessException("Product is already unavailable.");
         }
 
         product.setAvailable(false);
@@ -127,31 +135,19 @@ public class ProductServiceImpl implements ProductService {
 
     private void validateProductData(Product product) {
         if (product == null) {
-            throw new IllegalArgumentException("Product cannot be null.");
+            throw new ValidationException("Product cannot be null.");
         }
 
-        if (product.getName() == null || product.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Product name is required.");
-        }
-
-        if (product.getCategory() == null || product.getCategory().trim().isEmpty()) {
-            throw new IllegalArgumentException("Product category is required.");
-        }
-
-        if (product.getPrice() == null) {
-            throw new IllegalArgumentException("Product price is required.");
-        }
-
-        if (product.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Product price must be greater than zero.");
+        if (product.getPrice() != null && product.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new ValidationException("Product price must be greater than zero.");
         }
 
         if (product.getRestaurant() == null) {
-            throw new IllegalArgumentException("Restaurant is required.");
+            throw new ValidationException("Restaurant is required.");
         }
 
         if (product.getRestaurant().getId() == null) {
-            throw new IllegalArgumentException("Restaurant ID is required.");
+            throw new ValidationException("Restaurant ID is required.");
         }
     }
 

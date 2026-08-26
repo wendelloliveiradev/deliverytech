@@ -19,13 +19,17 @@ import com.deliverytech.delivery_api.services.interfaces.CustomerService;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Positive;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/customers")
 @RequiredArgsConstructor
+@Validated
 public class CustomerController {
     private final CustomerService customerService;
 
@@ -64,7 +68,7 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getCustomerById(@PathVariable Long id) {
+    public ResponseEntity<?> getCustomerById(@PathVariable @Positive Long id) {
         try {
             return ResponseEntity.ok(customerService.findById(id));
         } catch (EntityNotFoundException e) {
@@ -73,7 +77,7 @@ public class CustomerController {
     }
 
     @GetMapping("/email/{email}")
-    public ResponseEntity<?> getCustomerByEmail(@RequestParam String email) {
+    public ResponseEntity<?> getCustomerByEmail(@RequestParam @Email String email) {
         try {
             return ResponseEntity.ok(customerService.findByEmail(email));
         } catch (EntityNotFoundException e) {
@@ -82,7 +86,8 @@ public class CustomerController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateCustomer(@PathVariable Long id, @Valid @RequestBody CustomerRequestDto customerDto) {
+    public ResponseEntity<?> updateCustomer(@PathVariable @Positive Long id,
+            @Valid @RequestBody CustomerRequestDto customerDto) {
         try {
             return ResponseEntity.ok(customerService.update(id, customerDto));
         } catch (EntityNotFoundException e) {
@@ -93,7 +98,7 @@ public class CustomerController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCustomer(@PathVariable Long id) {
+    public ResponseEntity<?> deleteCustomer(@PathVariable @Positive Long id) {
         try {
             customerService.deactivate(id);
             return ResponseEntity.ok("Customer deleted successfully");
