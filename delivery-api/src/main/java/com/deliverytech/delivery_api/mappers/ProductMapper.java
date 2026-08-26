@@ -2,8 +2,8 @@ package com.deliverytech.delivery_api.mappers;
 
 import org.springframework.stereotype.Component;
 
-import com.deliverytech.delivery_api.dtos.ProductRequestDto;
-import com.deliverytech.delivery_api.dtos.ProductResponseDto;
+import com.deliverytech.delivery_api.dtos.requests.ProductRequestDto;
+import com.deliverytech.delivery_api.dtos.responses.ProductResponseDto;
 import com.deliverytech.delivery_api.models.entity.Product;
 import com.deliverytech.delivery_api.models.entity.Restaurant;
 

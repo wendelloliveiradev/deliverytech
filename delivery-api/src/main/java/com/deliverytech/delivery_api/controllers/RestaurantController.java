@@ -7,13 +7,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.deliverytech.delivery_api.dtos.RestaurantRequestDto;
-import com.deliverytech.delivery_api.dtos.RestaurantResponseDto;
+import com.deliverytech.delivery_api.dtos.requests.RestaurantRequestDto;
+import com.deliverytech.delivery_api.dtos.responses.RestaurantResponseDto;
 import com.deliverytech.delivery_api.services.interfaces.RestaurantService;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RestController
 @RequestMapping("/restaurants")
 @RequiredArgsConstructor
+@Validated
 public class RestaurantController {
     private final RestaurantService restaurantService;
 
@@ -49,7 +53,7 @@ public class RestaurantController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getRestaurantById(@PathVariable Long id) {
+    public ResponseEntity<?> getRestaurantById(@PathVariable @Positive Long id) {
         try {
             return ResponseEntity.ok(restaurantService.findById(id));
         } catch (EntityNotFoundException e) {
@@ -58,7 +62,7 @@ public class RestaurantController {
     }
 
     @GetMapping("/category/{category}")
-    public ResponseEntity<?> getRestaurantsByCategory(@PathVariable String category) {
+    public ResponseEntity<?> getRestaurantsByCategory(@PathVariable @NotBlank String category) {
         try {
             return ResponseEntity.ok(restaurantService.findByCategory(category));
         } catch (IllegalArgumentException e) {
@@ -72,7 +76,8 @@ public class RestaurantController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateRestaurant(@PathVariable Long id, @Valid @RequestBody RestaurantRequestDto dto) {
+    public ResponseEntity<?> updateRestaurant(@PathVariable @Positive Long id,
+            @Valid @RequestBody RestaurantRequestDto dto) {
         try {
             return ResponseEntity.ok(restaurantService.update(id, dto));
         } catch (EntityNotFoundException e) {
@@ -83,7 +88,7 @@ public class RestaurantController {
     }
 
     @PatchMapping("/{id}/activate")
-    public ResponseEntity<?> activateRestaurant(@PathVariable Long id) {
+    public ResponseEntity<?> activateRestaurant(@PathVariable @Positive Long id) {
         try {
             restaurantService.activate(id);
             return ResponseEntity.ok("Restaurant activated");
@@ -95,9 +100,9 @@ public class RestaurantController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteRestaurant(@PathVariable Long id) {
+    public ResponseEntity<?> deleteRestaurant(@PathVariable @Positive Long id) {
         try {
-            restaurantService.inactivate(id);
+            restaurantService.deactivate(id);
             return ResponseEntity.ok("Restaurant inactivated");
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

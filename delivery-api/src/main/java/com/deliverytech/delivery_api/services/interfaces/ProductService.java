@@ -1,7 +1,7 @@
 package com.deliverytech.delivery_api.services.interfaces;
 
-import com.deliverytech.delivery_api.dtos.ProductRequestDto;
-import com.deliverytech.delivery_api.dtos.ProductResponseDto;
+import com.deliverytech.delivery_api.dtos.requests.ProductRequestDto;
+import com.deliverytech.delivery_api.dtos.responses.ProductResponseDto;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public interface ProductService {
 
     ProductResponseDto update(Long id, ProductRequestDto updatedProduct);
 
-    void makeUnavailable(Long id);
-
     void makeAvailable(Long id);
+
+    void makeUnavailable(Long id);
 }
