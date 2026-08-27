@@ -7,13 +7,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.deliverytech.delivery_api.dtos.ProductRequestDto;
-import com.deliverytech.delivery_api.dtos.ProductResponseDto;
+import com.deliverytech.delivery_api.dtos.requests.ProductRequestDto;
+import com.deliverytech.delivery_api.dtos.responses.ProductResponseDto;
 import com.deliverytech.delivery_api.services.interfaces.ProductService;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
+@Validated
 public class ProductController {
     private final ProductService productService;
 
@@ -51,7 +55,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getProductById(@PathVariable Long id) {
+    public ResponseEntity<?> getProductById(@PathVariable @Positive Long id) {
         try {
             return ResponseEntity.ok(productService.findById(id));
         } catch (EntityNotFoundException e) {
@@ -60,7 +64,7 @@ public class ProductController {
     }
 
     @GetMapping("/restaurant/{restaurantId}")
-    public ResponseEntity<?> getProductsByRestaurant(@PathVariable Long restaurantId) {
+    public ResponseEntity<?> getProductsByRestaurant(@PathVariable @Positive Long restaurantId) {
         try {
             return ResponseEntity.ok(productService.findByRestaurant(restaurantId));
         } catch (EntityNotFoundException e) {
@@ -68,8 +72,17 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/category/{category}")
+    public ResponseEntity<?> getProductsByCategory(@PathVariable @NotBlank String category) {
+        try {
+            return ResponseEntity.ok(productService.findByCategory(category));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequestDto dto) {
+    public ResponseEntity<?> updateProduct(@PathVariable @Positive Long id, @Valid @RequestBody ProductRequestDto dto) {
         try {
             return ResponseEntity.ok(productService.update(id, dto));
         } catch (EntityNotFoundException e) {
@@ -80,7 +93,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}/available")
-    public ResponseEntity<?> makeAvailable(@PathVariable Long id) {
+    public ResponseEntity<?> makeAvailable(@PathVariable @Positive Long id) {
         try {
             productService.makeAvailable(id);
             return ResponseEntity.ok("Product is now available");
@@ -91,8 +104,20 @@ public class ProductController {
         }
     }
 
+    @PatchMapping("/{id}/unavailable")
+    public ResponseEntity<?> makeUnavailable(@PathVariable @Positive Long id) {
+        try {
+            productService.makeUnavailable(id);
+            return ResponseEntity.ok("Product is now unavailable");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<?> deleteProduct(@PathVariable @Positive Long id) {
         try {
             productService.makeUnavailable(id);
             return ResponseEntity.ok("Product marked as unavailable");

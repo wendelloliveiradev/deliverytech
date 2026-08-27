@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.deliverytech.delivery_api.dtos.CustomerOrderResponseDto;
-import com.deliverytech.delivery_api.dtos.OrderItemResponseDto;
+import com.deliverytech.delivery_api.dtos.responses.CustomerOrderResponseDto;
+import com.deliverytech.delivery_api.dtos.responses.OrderItemResponseDto;
 import com.deliverytech.delivery_api.models.entity.CustomerOrder;
 import com.deliverytech.delivery_api.models.entity.OrderItem;
 

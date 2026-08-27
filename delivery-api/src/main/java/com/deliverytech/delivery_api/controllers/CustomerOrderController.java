@@ -15,18 +15,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.deliverytech.delivery_api.dtos.CustomerOrderCreateRequestDto;
-import com.deliverytech.delivery_api.dtos.CustomerOrderStatusUpdateRequestDto;
+import com.deliverytech.delivery_api.dtos.requests.CustomerOrderCreateRequestDto;
+import com.deliverytech.delivery_api.dtos.requests.CustomerOrderStatusUpdateRequestDto;
 import com.deliverytech.delivery_api.models.enums.CustomerOrderStatus;
 import com.deliverytech.delivery_api.services.interfaces.CustomerOrderService;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 
 @RestController
 @RequestMapping("/customer-order")
 @RequiredArgsConstructor
+@Validated
 public class CustomerOrderController {
     private final CustomerOrderService customerOrderService;
 
@@ -65,7 +68,7 @@ public class CustomerOrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getCustomerOrderById(@PathVariable Long id) {
+    public ResponseEntity<?> getCustomerOrderById(@PathVariable @Positive Long id) {
         try {
             return ResponseEntity.ok(customerOrderService.findById(id));
         } catch (EntityNotFoundException e) {
@@ -75,7 +78,7 @@ public class CustomerOrderController {
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<?> updateCustomerOrderStatus(
-            @PathVariable Long id,
+            @PathVariable @Positive Long id,
             @Valid @RequestBody CustomerOrderStatusUpdateRequestDto statusDto) {
         try {
             return ResponseEntity.ok(customerOrderService.changeStatus(id, statusDto.status()));
@@ -87,7 +90,7 @@ public class CustomerOrderController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCustomerOrder(@PathVariable Long id) {
+    public ResponseEntity<?> deleteCustomerOrder(@PathVariable @Positive Long id) {
         try {
             return ResponseEntity.ok(customerOrderService.cancel(id));
         } catch (EntityNotFoundException e) {

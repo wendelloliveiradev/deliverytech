@@ -1,7 +1,7 @@
 package com.deliverytech.delivery_api.services.interfaces;
 
-import com.deliverytech.delivery_api.dtos.RestaurantRequestDto;
-import com.deliverytech.delivery_api.dtos.RestaurantResponseDto;
+import com.deliverytech.delivery_api.dtos.requests.RestaurantRequestDto;
+import com.deliverytech.delivery_api.dtos.responses.RestaurantResponseDto;
 
 import java.util.List;
 
@@ -20,7 +20,9 @@ public interface RestaurantService {
 
     RestaurantResponseDto update(Long id, RestaurantRequestDto updatedRestaurant);
 
-    void inactivate(Long id);
-
     void activate(Long id);
+
+    void deactivate(Long id);
+
+    void calculateDeliveryFee(Long restaurantId, Double distance);
 }

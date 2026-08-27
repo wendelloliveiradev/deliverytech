@@ -1,22 +1,27 @@
 package com.deliverytech.delivery_api.services.implementations;
 
-import com.deliverytech.delivery_api.dtos.CustomerOrderCreateRequestDto;
-import com.deliverytech.delivery_api.dtos.CustomerOrderResponseDto;
-import com.deliverytech.delivery_api.dtos.OrderItemRequestDto;
+import com.deliverytech.delivery_api.dtos.requests.CustomerOrderCreateRequestDto;
+import com.deliverytech.delivery_api.dtos.requests.OrderItemRequestDto;
+import com.deliverytech.delivery_api.dtos.responses.CustomerOrderResponseDto;
+import com.deliverytech.delivery_api.exceptions.BusinessException;
+import com.deliverytech.delivery_api.exceptions.EntityNotFoundException;
+import com.deliverytech.delivery_api.exceptions.TransactionException;
+import com.deliverytech.delivery_api.exceptions.ValidationException;
 import com.deliverytech.delivery_api.mappers.CustomerOrderMapper;
 import com.deliverytech.delivery_api.models.entity.Customer;
 import com.deliverytech.delivery_api.models.entity.CustomerOrder;
 import com.deliverytech.delivery_api.models.entity.OrderItem;
 import com.deliverytech.delivery_api.models.entity.Product;
+import com.deliverytech.delivery_api.models.entity.Restaurant;
 import com.deliverytech.delivery_api.models.enums.CustomerOrderStatus;
 import com.deliverytech.delivery_api.repositories.CustomerRepository;
 import com.deliverytech.delivery_api.repositories.CustomerOrderRepository;
 import com.deliverytech.delivery_api.repositories.ProductRepository;
 import com.deliverytech.delivery_api.services.interfaces.CustomerOrderService;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +31,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CustomerOrderServiceImpl implements CustomerOrderService {
     private final CustomerOrderRepository customerOrderRepository;
     private final CustomerRepository customerRepository;
@@ -40,8 +46,11 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         Customer customer = validateCustomer(orderRequestDto.customerId());
         CustomerOrder order = new CustomerOrder();
         order.setCustomer(customer);
-        order.setOrderItems(buildOrderItems(orderRequestDto.orderItems(), order));
-        order.setTotalAmount(calculateOrderTotal(order.getOrderItems()));
+
+        List<OrderItem> orderItems = buildOrderItems(orderRequestDto.orderItems(), order);
+        Restaurant restaurant = validateRestaurantOfItems(orderItems);
+        order.setOrderItems(orderItems);
+        order.setTotalAmount(calculateOrderTotal(orderItems, restaurant));
 
         if (order.getOrderDate() == null) {
             order.setOrderDate(LocalDateTime.now());
@@ -51,7 +60,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
             order.setStatus(CustomerOrderStatus.CONFIRMED);
         }
 
-        CustomerOrder savedOrder = customerOrderRepository.save(order);
+        CustomerOrder savedOrder = saveOrder(order);
         return customerOrderMapper.toResponse(savedOrder);
     }
 
@@ -75,7 +84,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Override
     public List<CustomerOrderResponseDto> findByStatus(CustomerOrderStatus status) {
         if (status == null) {
-            throw new IllegalArgumentException("Status is required.");
+            throw new ValidationException("Status is required.");
         }
 
         return customerOrderRepository.findByStatus(status).stream()
@@ -86,11 +95,11 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Override
     public List<CustomerOrderResponseDto> findByPeriod(LocalDateTime start, LocalDateTime end) {
         if (start == null || end == null) {
-            throw new IllegalArgumentException("Start and end dates are required.");
+            throw new ValidationException("Start and end dates are required.");
         }
 
         if (start.isAfter(end)) {
-            throw new IllegalArgumentException("Start date cannot be after end date.");
+            throw new ValidationException("Start date cannot be after end date.");
         }
 
         return customerOrderRepository.findByOrderDateBetweenDesc(start, end).stream()
@@ -99,6 +108,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
+    @Transactional
     public CustomerOrderResponseDto changeStatus(Long orderId, CustomerOrderStatus newStatus) {
         CustomerOrder order = customerOrderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -107,26 +117,40 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         order.getStatus().ensureTransitionTo(newStatus);
         order.setStatus(newStatus);
 
-        CustomerOrder savedOrder = customerOrderRepository.save(order);
+        CustomerOrder savedOrder = saveOrder(order);
         return customerOrderMapper.toResponse(savedOrder);
     }
 
     @Override
+    @Transactional
     public CustomerOrderResponseDto cancel(Long orderId) {
         return changeStatus(orderId, CustomerOrderStatus.CANCELLED);
     }
 
+    /**
+     * Wraps optimistic-locking failures so concurrent updates surface as a
+     * transactional error.
+     */
+    private CustomerOrder saveOrder(CustomerOrder order) {
+        try {
+            return customerOrderRepository.save(order);
+        } catch (OptimisticLockingFailureException ex) {
+            throw new TransactionException(
+                    "Order was modified concurrently and could not be saved. Please retry.", ex);
+        }
+    }
+
     private void validateOrder(CustomerOrderCreateRequestDto orderRequestDto) {
         if (orderRequestDto == null) {
-            throw new IllegalArgumentException("Order cannot be null.");
+            throw new ValidationException("Order cannot be null.");
         }
 
         if (orderRequestDto.customerId() == null) {
-            throw new IllegalArgumentException("Customer ID is required.");
+            throw new ValidationException("Customer ID is required.");
         }
 
         if (orderRequestDto.orderItems() == null || orderRequestDto.orderItems().isEmpty()) {
-            throw new IllegalArgumentException("Order must have at least one item.");
+            throw new ValidationException("Order must have at least one item.");
         }
     }
 
@@ -136,7 +160,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                         "Customer not found with ID: " + customerId));
 
         if (!Boolean.TRUE.equals(customer.getActive())) {
-            throw new IllegalArgumentException("Inactive customers cannot place orders.");
+            throw new BusinessException("Inactive customers cannot place orders.");
         }
 
         return customer;
@@ -156,15 +180,44 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }).toList();
     }
 
-    private BigDecimal calculateOrderTotal(List<OrderItem> orderItems) {
-        return orderItems.stream()
+    /**
+     * Ensures every item belongs to the same restaurant and that restaurant exists
+     * and is active.
+     */
+    private Restaurant validateRestaurantOfItems(List<OrderItem> orderItems) {
+        Restaurant restaurant = orderItems.get(0).getProduct().getRestaurant();
+
+        if (restaurant == null) {
+            throw new EntityNotFoundException("Product is not associated with any restaurant.");
+        }
+
+        if (!Boolean.TRUE.equals(restaurant.getActive())) {
+            throw new BusinessException("Orders cannot be placed with an inactive restaurant.");
+        }
+
+        boolean allSameRestaurant = orderItems.stream()
+                .allMatch(item -> restaurant.getId().equals(item.getProduct().getRestaurant().getId()));
+
+        if (!allSameRestaurant) {
+            throw new BusinessException("All products in an order must belong to the same restaurant.");
+        }
+
+        return restaurant;
+    }
+
+    private BigDecimal calculateOrderTotal(List<OrderItem> orderItems, Restaurant restaurant) {
+        BigDecimal itemsTotal = orderItems.stream()
                 .map(OrderItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal deliveryFee = restaurant.getDeliveryFee() != null ? restaurant.getDeliveryFee() : BigDecimal.ZERO;
+
+        return itemsTotal.add(deliveryFee);
     }
 
     private Product validateProduct(Long productId) {
         if (productId == null) {
-            throw new IllegalArgumentException("Product ID is required.");
+            throw new ValidationException("Product ID is required.");
         }
 
         Product product = productRepository.findById(productId)
@@ -172,7 +225,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                         "Product not found with ID: " + productId));
 
         if (!Boolean.TRUE.equals(product.getAvailable())) {
-            throw new IllegalArgumentException("Unavailable products cannot be added to an order.");
+            throw new BusinessException("Unavailable products cannot be added to an order.");
         }
 
         return product;

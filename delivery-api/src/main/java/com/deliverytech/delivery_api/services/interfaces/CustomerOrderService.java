@@ -1,7 +1,7 @@
 package com.deliverytech.delivery_api.services.interfaces;
 
-import com.deliverytech.delivery_api.dtos.CustomerOrderCreateRequestDto;
-import com.deliverytech.delivery_api.dtos.CustomerOrderResponseDto;
+import com.deliverytech.delivery_api.dtos.requests.CustomerOrderCreateRequestDto;
+import com.deliverytech.delivery_api.dtos.responses.CustomerOrderResponseDto;
 import com.deliverytech.delivery_api.models.enums.CustomerOrderStatus;
 
 import java.time.LocalDateTime;
