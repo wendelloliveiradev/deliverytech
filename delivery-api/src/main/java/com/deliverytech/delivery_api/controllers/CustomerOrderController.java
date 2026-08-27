@@ -25,7 +25,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/customers-orders")
+@RequestMapping("/customer-order")
 @RequiredArgsConstructor
 public class CustomerOrderController {
     private final CustomerOrderService customerOrderService;
