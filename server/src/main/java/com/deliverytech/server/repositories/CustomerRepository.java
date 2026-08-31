@@ -1,0 +1,32 @@
+package com.deliverytech.server.repositories;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import com.deliverytech.server.models.entity.Customer;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface CustomerRepository extends JpaRepository<Customer, Long> {
+
+    Optional<Customer> findByEmail(String email);
+
+    List<Customer> findByActiveTrue();
+
+    boolean existsByEmail(String email);
+
+    List<Customer> findByNameContainingIgnoreCase(String name);
+
+    Optional<Customer> findByPhone(String phone);
+
+    @Query("SELECT DISTINCT c FROM Customer c JOIN c.customerOrders f WHERE c.active = true")
+    List<Customer> findCustomersWithFoodOrders();
+
+    @Query("SELECT c FROM Customer c WHERE c.address LIKE CONCAT('%', :city, '%')")
+    List<Customer> findByCity(@Param("city") String city);
+
+    @Query("SELECT COUNT(c) FROM Customer c WHERE c.active = true")
+    Long countActiveCustomers();
+}
