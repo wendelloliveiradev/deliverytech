@@ -1,12 +1,7 @@
-# Documentation Index
+# DeliveryTech Documentation
 
-This folder contains the supporting documentation for the current state of the delivery API.
-
-## Available Docs
-
-- [Current State](current-state.md): implementation status, domain model, and runtime behavior.
-
-## Recommended Reading Order
-
-1. Start with [current-state.md](current-state.md).
-2. Return to [delivery-api/README.md](../delivery-api/README.md) for setup and quick start instructions.
+- [Architecture](ARCHITECTURE.md): workspace layout, backend layers, and integrations.
+- [Domain Model](DOMAIN.md): entities, relationships, lifecycle rules, and ownership model.
+- [API Reference](API.md): canonical routes, security policy, and error contract.
+- [Development Guide](DEVELOPMENT.md): setup, configuration, testing, and coverage.
+- [Current State](current-state.md): concise implementation status and known limitations.

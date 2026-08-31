@@ -1,81 +1,25 @@
 # Current State
 
-This document describes the application as it exists today, not the intended end state.
+DeliveryTech is a working Spring Boot 4 delivery API with DTO-based REST controllers, H2 persistence, seed data, JWT authentication, OpenAPI documentation, and JaCoCo reporting.
 
-## Overview
+## Implemented
 
-The project is a Spring Boot delivery API backed by an in-memory H2 database. It currently contains the core domain model, service layer logic, sample data loading, and one implemented REST surface for customers.
+- Customer, restaurant, product, and customer-order operations.
+- Restaurant category, rating, CEP, coordinates, delivery fee, and delivery-time data.
+- CEP-backed delivery-fee estimation and nearby restaurant lookup.
+- Product description and stock tracking; successful orders reserve stock in the enclosing transaction.
+- Order delivery address, status-transition validation, and cancellation flow.
+- JWT registration, login, and current-user endpoints with BCrypt password hashes.
+- Restaurant sales, best-selling product, active-customer, and date/status order reports.
+- One centralized `ApiError` response for validation, not-found, business, transaction, malformed-request, invalid-credential, and unexpected failures.
 
-## Domain Model
+## Compatibility
 
-```mermaid
-erDiagram
-    CUSTOMER ||--o{ CUSTOMER_ORDER : places
-    CUSTOMER_ORDER ||--o{ ORDER_ITEM : contains
-    RESTAURANT ||--o{ PRODUCT : offers
-    PRODUCT ||--o{ ORDER_ITEM : referenced_by
-```
+Canonical REST endpoints use `/api`. Legacy unprefixed controller mappings are still served for existing clients and tests. Only canonical `/api` mutating/reporting endpoints are currently protected by the HTTP security rule; see [API Reference](API.md) for the exact policy.
 
-### Core Entities
+## Known Limitations
 
-- `Customer`: customer profile, contact data, and active flag.
-- `Restaurant`: restaurant profile, category, rating, delivery fee, and active flag.
-- `Product`: catalog item associated with a restaurant.
-- `CustomerOrder`: order header with status, total amount, and order date.
-- `OrderItem`: line item that connects an order to a product.
-
-## Business Rules
-
-- Customer email must be unique.
-- Customers must be active to create or manage orders.
-- Product price must be greater than zero.
-- Restaurant rating must be between 0 and 5.
-- Order status transitions are guarded by `CustomerOrderStatus`.
-
-## Data Loading
-
-`DataLoader` inserts sample data at startup so the application has realistic records immediately after boot.
-
-Seeded data includes:
-
-- 3 customers
-- 2 restaurants
-- 5 products
-- 2 orders with order items
-
-## API Surface
-
-### Implemented
-
-- `POST /customers`
-- `GET /customers`
-- `GET /customers/{id}`
-- `PUT /customers/{id}`
-- `DELETE /customers/{id}`
-
-### Scaffolded Only
-
-- `/restaurants`
-- `/products`
-- `/customers-orders`
-
-Those controllers currently return placeholder responses and should not be treated as complete API contracts.
-
-## Runtime Configuration
-
-- Application port: `8080`
-- Database: H2 in-memory at `jdbc:h2:mem:deliverydb`
-- Schema mode: `create-drop`
-- SQL logging: enabled
-- H2 console: `/h2-console`
-
-## Repository Layer
-
-The repositories already expose query methods for active customers, products by restaurant, restaurant rankings, and customer order searches by date, status, and customer.
-
-## Known Gaps
-
-- The domain is richer than the HTTP layer, but most endpoints are not wired yet.
-- There are no DTOs or API response contracts yet.
-- Error handling is still basic and inconsistent across controllers.
-- The only automated test in the repository is the Spring Boot context test.
+- CEP lookup depends on the configured external geocoder and returns a business error if coordinates are unavailable.
+- The H2 database is intended for local development and resets at shutdown.
+- Role claims are issued in JWTs, but resource-level ownership enforcement and role-specific controller rules have not yet been applied across the full API surface.
+- The `client/` directory is a placeholder, not a frontend implementation.
