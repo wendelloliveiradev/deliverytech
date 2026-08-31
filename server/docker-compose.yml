@@ -1,0 +1,10 @@
+services:
+  server:
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-local-development-secret-not-for-production}
+      APP_VERSION: ${APP_VERSION:-local}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-local}

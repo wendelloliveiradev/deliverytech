@@ -1,0 +1,15 @@
+package com.deliverytech.server.dtos.requests;
+
+import java.util.List;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
+public record CustomerOrderCreateRequestDto(
+        @NotNull(message = "Customer id is required") Long customerId,
+
+        @NotEmpty(message = "Order must have at least one item") List<@Valid OrderItemRequestDto> orderItems,
+
+        @jakarta.validation.constraints.NotBlank(message = "Delivery address is required") String deliveryAddress) {
+}
